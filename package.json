@@ -1,0 +1,22 @@
+{
+  "name": "hyperwave",
+  "version": "1.0.50",
+  "scripts": {
+    "css": "unocss \"src/**/*.tsx\" -o public/styles/uno.css",
+    "css:watch": "unocss \"src/**/*.tsx\" -o public/styles/uno.css --watch",
+    "server:watch": "bun --watch run src/server.tsx",
+    "dev": "concurrently \"bun css:watch\" \"bun server:watch\"",
+    "test": "bun run test",
+    "prettier": "bunx prettier --write src/ test/",
+    "build": "bun css && bun build --compile ./src/server.tsx"
+  },
+  "dependencies": {
+    "hono": "^3.6.3"
+  },
+  "devDependencies": {
+    "@unocss/cli": "^0.56.5",
+    "bun-types": "latest",
+    "concurrently": "^8.2.1"
+  },
+  "module": "src/server.tsx"
+}

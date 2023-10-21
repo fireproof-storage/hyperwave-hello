@@ -13,7 +13,9 @@ This ensures we get the filesystem and node-crypto APIs, instead of the browser 
 * In a production deployment you'd want to link your edge Fireproof instances (the ones in your Bun server) to each other, most likely using something like PartyKit (CloudFlare durable objects) or IPFS. More info on [connecting Fireproof instances can be found here](https://use-fireproof.com/docs/connect/).
 * Read the Hono docs to learn [about deploying this app to edge functions](https://hono.dev).
 
-## hyperwave 🌊
+Original README below:
+
+## Built using hyperwave 🌊
 
 https://hyperwave.codes/
 

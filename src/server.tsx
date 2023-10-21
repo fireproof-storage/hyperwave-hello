@@ -1,48 +1,86 @@
-import { Hono } from "hono";
-import { logger } from "hono/logger";
-import Layout from "./Layout.tsx";
-import { serveStatic } from "hono/bun";
+import { Hono } from 'hono'
+import { logger } from 'hono/logger'
+import Layout from './Layout.tsx'
+import { serveStatic } from 'hono/bun'
+import { fireproof } from '@fireproof/core/node'
 
-const app = new Hono();
+const db = fireproof('hyperwave')
 
-app.use("/styles/*", serveStatic({ root: "./public/" }));
+const app = new Hono()
 
-app.use("*", logger());
+app.use('/styles/*', serveStatic({ root: './public/' }))
 
-app.onError((err, c) => c.html(<Layout>{err}</Layout>));
+app.use('*', logger())
 
-app.get("/instructions", ({ html }) =>
-  html(
-    <div class="text-md bg-blue-100 rounded-md p-8 self-start shadow-sm">
-      <ol class="flex flex-col gap-4">
-        <p>
-          <code>$ bun dev</code>
-        </p>
-        <li>
-          edit <code>src/server.ts</code>
-        </li>
-        <li>profit 🚀</li>
-      </ol>
-    </div>,
-  ),
-);
+app.onError((err, c) => c.html(<Layout title="Error">{err}</Layout>))
 
-app.get("/", ({ html }) =>
+app.post('/message', async ({ req, html }) => {
+  const body = await req.parseBody()
+  const ok = await db.put(body as Record<string, string>)
+  return html(
+    <span id="status" hx-swap="innerHTML">
+      Posted: {ok.id}
+    </span>
+  )
+})
+
+app.get('/messages', async ({ html }) => {
+  console.log('get')
+  const messages = await db.allDocs()
+  console.log(messages)
+  const docs = messages.rows.map(r => r.value)
+  return html(
+    <ul>
+      {docs.map(doc => (
+        <li>{doc.message}</li>
+      ))}
+    </ul>
+  )
+})
+
+app.get('/', ({ html }) =>
   html(
     <Layout title="hyperwave">
       <section class="flex flex-col gap-8">
-        <div>
-          <button
-            class="bg-blue-100 p-4 text-sm font-bold rounded-md shadow-sm"
-            hx-get="/instructions"
-            hx-target="closest div"
-          >
-            fetch instructions from <code>/instructions</code>
-          </button>
-        </div>
-      </section>
-    </Layout>,
-  ),
-);
+        <form hx-post="/message" hx-target="#status" hx-boost="true">
+          <div>
+            <label for="message" class="font-bold text-sm mr-6">
+              Message
+            </label>
+            <input
+              type="text"
+              name="message"
+              id="message"
+              class="bg-blue-100 p-4 text-sm font-bold rounded-md shadow-sm"
+            />
 
-export default app;
+            <button
+              type="submit"
+              class="bg-blue-100 ml-8 p-4 text-sm font-bold rounded-md shadow-sm"
+              hx-trigger="htmx:afterOnLoad:javascript:document.getElementById('message').value=''"
+            >
+              send message to <code>/message</code>
+            </button>
+          </div>
+        </form>
+        Post status:{' '}
+        <span id="status" hx-swap="innerHTML">
+          none
+        </span>
+        <button
+          class="bg-blue-100 p-4 text-sm font-bold rounded-md shadow-sm"
+          hx-get="/messages"
+          hx-swap="innerHTML"
+          hx-target="#messages"
+        >
+          fetch messages from <code>/messages</code>
+        </button>
+        <ul id="messages">
+          <li></li>
+        </ul>
+      </section>
+    </Layout>
+  )
+)
+
+export default app

@@ -11,7 +11,9 @@
     "build": "bun css && bun build --compile ./src/server.tsx"
   },
   "dependencies": {
-    "hono": "^3.6.3"
+    "@fireproof/core": "^0.14.0",
+    "hono": "^3.6.3",
+    "use-fireproof": "^0.14.0"
   },
   "devDependencies": {
     "@unocss/cli": "^0.56.5",

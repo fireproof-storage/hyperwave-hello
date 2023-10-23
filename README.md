@@ -6,7 +6,7 @@ This is a simple proof-of-concept to get you started using Fireproof on the serv
 import { fireproof } from '@fireproof/core/node'
 ```
 
-This ensures we get the filesystem and node-crypto APIs, instead of the browser versions.
+This ensures we get the server build, which uses the filesystem and Node.js crypto APIs, instead of the browser versions.
 
 ## Notes
 
